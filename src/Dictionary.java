@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 
 public class Dictionary {
-    protected Map<String,Word> dictionary = new LinkedHashMap<String,Word>();
+    public static Map<String,Word> dictionary = new LinkedHashMap<String,Word>();
+
 
 }

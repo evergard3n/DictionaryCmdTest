@@ -1,22 +1,34 @@
+import java.io.*;
 import java.util.Map;
 import java.util.Scanner;
 
-public class DictionaryManagement extends Dictionary {
-    public String wordSearch(String word_Target) {
-        if (dictionary.containsKey(word_Target)) {
-            return dictionary.get(word_Target).getWord_explain();
-        } else {
-            return null;
-        }
-    }
+public class DictionaryManagement  {
 
-    public Scanner scn = new Scanner(System.in);
+//    public String wordSearch(String word_Target) {
+//        if (DictionaryUtils.dict.containsKey(word_Target)) {
+//            return dictionary.get(word_Target).getWord_explain();
+//        } else {
+//            return null;
+//        }
+//    }
+    /**Scanner ini.*/
+    public static Scanner scn = new Scanner(System.in);
 
-    public void closeScanner() {
+    public static void closeScanner() {
         scn.close();
     }
-
-    public void insertFromCmdline() {
+    /**Look up*/
+    public static String dictionaryLookUp(String target) {
+        if(Dictionary.dictionary.containsKey(target)) {
+            Word dest  = Dictionary.dictionary.get(target);
+            return dest.toString();
+        }
+        else {
+            return "Not found!";
+        }
+    }
+    /**Insert from cmd line.*/
+    public static void insertFromCmdline() {
         System.out.println("Insert number of words");
 
         int N = scn.nextInt();
@@ -25,90 +37,74 @@ public class DictionaryManagement extends Dictionary {
             String wordTarget = scn.next();
             scn.nextLine();
             String wordDef = scn.nextLine();
-            dictionary.put(wordTarget, new Word(wordTarget, wordDef));
+            Dictionary.dictionary.put(wordTarget, new Word(wordTarget, wordDef));
         }
 
     }
+    public static void deleteWord(String target) {
+        if(Dictionary.dictionary.containsKey(target)) {
+            Dictionary.dictionary.remove(target);
+        }
+        else {
+            System.out.println("No such word exists!");
+        }
+    }
+    public static void updateWord(String target) {
+        if(Dictionary.dictionary.containsKey(target)) {
+            System.out.println("Enter new definition: ");
+            String def = scn.nextLine();
+            Dictionary.dictionary.get(target).setWord_explain(def);
+            scn.nextLine();
+        }
+        else {
+            System.out.println("No such word exists!");
+        }
+    }
+    /**Insert from file*/
+    public static void insertFromFile(String src) {
+        try {
+            File file = new File(src);
+            Scanner scnF = new Scanner(file);
+            while (scnF.hasNextLine()) {
+                String line = scnF.nextLine();
 
-    public void EXIT() {
+                String[] stack = line.split("\t");
+                if(stack.length == 2) {
+                    Word newWord = new Word(stack[0],stack[1]);
+                    Dictionary.dictionary.put(stack[0],newWord);
+                }
+                else {
+                    System.err.println("Invalid line format: " + line);
+                }
+            }
+            scnF.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void exportToFile()  {
+        try {
+            FileWriter fw = new FileWriter("src/dictionaries.out");
+            BufferedWriter bw = new BufferedWriter(fw);
+            for (Map.Entry<String, Word> entry : Dictionary.dictionary.entrySet()) {
+                Word w = entry.getValue();
+                String res = w.toString() +"\n";
+                bw.write(res);
+            }
+            bw.flush();
+            bw.close();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    public static void EXIT() {
         closeScanner();
         System.exit(1);
     }
 
-    public String showAllWords() {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Word> entry : dictionary.entrySet()) {
-            Word w = entry.getValue();
-            sb.append(w.toString()).append("\n");
-        }
-        return sb.toString();
-    }
-
-    public void dictionaryBasic() {
 
 
-        int op = 0;
 
-        do {
-            System.out.println("Choose your character:");
-            System.out.println("1. Insert word from command line");
-            System.out.println("2. Show All Word");
-            System.out.println("3. Close");
-            op = scn.nextInt();
-            scn.nextLine();
-            switch (op) {
-                case 1 -> {
-                    insertFromCmdline();
-                }
-                case 2 -> {
-                    System.out.println("Showing all words");
-                    System.out.println(showAllWords());
-                }
-                case 3 -> {
-                    EXIT();
-                }
-
-                default -> {
-                    System.out.println("Invalid Operation!");
-                }
-            }
-            System.out.println("Do you wish to continue? YES / NO");
-            String string = scn.nextLine();
-            if (string.equals("YES")) {
-                dictionaryBasic();
-
-            } else if (string.equals("NO")) {
-                EXIT();
-            }
-        }
-        while (op != 0);
-
-
-//        switch (op) {
-//            case 1 -> {
-//                insertFromCmdline();
-//            }
-//            case 2 -> {
-//                System.out.println("Showing all words");
-//                System.out.println(showAllWords());
-//            }
-//            case 0 -> {
-//            }
-//
-//            default -> {
-//                System.out.println("Invalid Operation!");
-//            }
-//        }
-//        System.out.println("Do you wish to continue? YES / NO");
-//        String string = scn.nextLine();
-//        if(string.equals("YES")) {
-//            dictionaryBasic();
-//            scn.nextLine();
-//        }
-//        else if(string.equals("NO")){
-//            EXIT();
-//        }
-//        scn.nextLine();
-
-    }
 }
